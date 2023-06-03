@@ -1,5 +1,7 @@
 const userName = 'icly';
 const spikeThresold = 35;
+const show_L = false;
+
 const showError = false;
 
 
@@ -27,6 +29,9 @@ files.forEach(file => {
             }
             let outputStr = "";
             for (let i = 0; i < replayData.data.length; ++i) {
+                const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
+                if (!show_L && result[result.length - 1].data.reason !== "winner")
+                    continue;
                 let attackFrame = 0;
                 let spikeCount = 0;
                 let startAtkTime = 0;
@@ -36,7 +41,6 @@ files.forEach(file => {
                     const curEvent = replayData.data[i].replays[boardDir].events[j];
                     if (startAtkZone && curEvent.frame - attackFrame >= 55 || curEvent.type === "end") {
                         if(spikeCount >= spikeThresold) {
-                            const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
                             const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;
                             let minute = Math.floor(startAtkTime / 3600);
                             outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + spikeCount + " spike at " + minute + ":" + String(Math.floor(startAtkTime / 60) % 60).padStart(2, '0') + "\n";

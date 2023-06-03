@@ -1,6 +1,8 @@
 const userName = 'icly';
-const showError = false;
 const pcThresold = 3;
+const show_L = false;
+
+const showError = false;
 
 
 
@@ -27,6 +29,8 @@ files.forEach(file => {
             let outputStr = "";
             for (let i = 0; i < replayData.data.length; ++i) {
                 const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
+                if (!show_L && result[result.length - 1].data.reason !== "winner")
+                    continue;
                 const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;
                 if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.stats.clears.allclear >= pcThresold)
                     outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + (result[result.length - 1].data.export.stats.clears.allclear) + " PCs" + "\n", ++foundCnt;

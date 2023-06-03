@@ -1,9 +1,12 @@
 const userName = 'icly';
-const spikeThresold = 35;
+const show_L = false; // show matches of losing
+const spikeThresold = 25;
 const comboThresold = 10;
-const pcThresold = 3;
-const apmThresold = 300;
-const showError = true;
+const pcThresold = 5;
+const b2bThresold = 14;
+const apmThresold = 280;
+
+const showError = false;
 
 
 
@@ -30,13 +33,17 @@ files.forEach(file => {
             }
             let outputStr = "";
             for (let i = 0; i < replayData.data.length; ++i) {
+                const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
+                if (!show_L && result[result.length - 1].data.reason !== "winner")
+                    continue;
                 let attackFrame = 0;
                 let spikeCount = 0;
                 let startAtkTime = 0;
                 let startAtkZone = false;
                 let spikeZone = false;
-                const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
                 const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;
+                if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.stats.topbtb - 1 >= b2bThresold)
+                    outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + (result[result.length - 1].data.export.stats.topbtb - 1) + " B2B" + "\n", ++foundCnt;
                 if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.stats.clears.allclear >= pcThresold)
                     outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + (result[result.length - 1].data.export.stats.clears.allclear) + " PCs" + "\n", ++foundCnt;
                 if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.aggregatestats.apm >= apmThresold)
@@ -46,7 +53,7 @@ files.forEach(file => {
                 for (let j = 0; j < replayData.data[i].replays[boardDir].events.length; ++j) {
                     const curEvent = replayData.data[i].replays[boardDir].events[j];
                     if (startAtkZone && curEvent.frame - attackFrame >= 55 || curEvent.type === "end") {
-                        if(spikeCount >= spikeThresold) {
+                        if (spikeCount >= spikeThresold) {
                             const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
                             const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;
                             let minute = Math.floor(startAtkTime / 3600);

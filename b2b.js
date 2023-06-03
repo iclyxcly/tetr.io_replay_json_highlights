@@ -1,5 +1,5 @@
 const userName = 'icly';
-const apmThresold = 300;
+const b2bThresold = 25;
 const show_L = false;
 
 const showError = false;
@@ -33,8 +33,8 @@ files.forEach(file => {
                 if (!show_L && result[result.length - 1].data.reason !== "winner")
                     continue;
                 const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;
-                if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.aggregatestats.apm >= apmThresold)
-                    outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + result[result.length - 1].data.export.aggregatestats.apm + " APM" + "\n", ++foundCnt;
+                if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.stats.topbtb - 1 >= b2bThresold)
+                    outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + (result[result.length - 1].data.export.stats.topbtb - 1) + " B2B" + "\n", ++foundCnt;
             }
             if (outputStr !== "")
                 console.log(file + ": \n" + outputStr + "-----------------------------");
@@ -45,4 +45,4 @@ files.forEach(file => {
     }
 });
 
-console.log("Total occurrence for " + apmThresold + " APM++: " + foundCnt);
+console.log("Total occurrence for " + b2bThresold + " B2B++: " + foundCnt);
