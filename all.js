@@ -1,6 +1,9 @@
 const userName = 'icly';
 const spikeThresold = 35;
-const showError = false;
+const comboThresold = 10;
+const pcThresold = 3;
+const apmThresold = 300;
+const showError = true;
 
 
 
@@ -32,6 +35,14 @@ files.forEach(file => {
                 let startAtkTime = 0;
                 let startAtkZone = false;
                 let spikeZone = false;
+                const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
+                const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;
+                if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.stats.clears.allclear >= pcThresold)
+                    outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + (result[result.length - 1].data.export.stats.clears.allclear) + " PCs" + "\n", ++foundCnt;
+                if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.aggregatestats.apm >= apmThresold)
+                    outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + result[result.length - 1].data.export.aggregatestats.apm + " APM" + "\n", ++foundCnt;
+                if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.stats.topcombo - 1 >= comboThresold)
+                    outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + (result[result.length - 1].data.export.stats.topcombo - 1) + " combo" + "\n", ++foundCnt;
                 for (let j = 0; j < replayData.data[i].replays[boardDir].events.length; ++j) {
                     const curEvent = replayData.data[i].replays[boardDir].events[j];
                     if (startAtkZone && curEvent.frame - attackFrame >= 55 || curEvent.type === "end") {
@@ -65,4 +76,4 @@ files.forEach(file => {
     }
 });
 
-console.log("Total occurrence for " + spikeThresold + " spike++: " + foundCnt);
+console.log("Total occurrence: " + foundCnt);
