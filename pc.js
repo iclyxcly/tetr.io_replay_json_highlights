@@ -1,7 +1,6 @@
 const userName = 'icly';
-const apmThresold = 300;
 const showError = false;
-
+const pcThresold = 3;
 
 
 
@@ -28,8 +27,8 @@ files.forEach(file => {
             let outputStr = "";
             for (let i = 0; i < replayData.data.length; ++i) {
                 const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
-                if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.aggregatestats.apm >= apmThresold)
-                    outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + result[result.length - 1].data.export.aggregatestats.apm + " APM" + "\n", ++ foundCnt;
+                if (result[result.length - 1].type === "end" && result[result.length - 1].data.export.stats.clears.allclear >= pcThresold)
+                    outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + (result[result.length - 1].data.export.stats.clears.allclear) + " PCs" + "\n", ++ foundCnt;
             }
             if (outputStr !== "")
                 console.log(file + ": \n" + outputStr + "-----------------------------");
@@ -40,4 +39,4 @@ files.forEach(file => {
     }
 });
 
-console.log("Total occurrence for " + apmThresold + " APM++: " + foundCnt);
+console.log("Total occurrence for " + pcThresold + " PCs++: " + foundCnt);

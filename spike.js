@@ -1,5 +1,5 @@
 const userName = 'icly';
-const spikeThresold = 25;
+const spikeThresold = 45;
 const showError = false;
 
 
@@ -49,7 +49,8 @@ files.forEach(file => {
                             spikeZone = !spikeZone;
                             let minute = Math.floor(startAtkTime / 60 / 60);
                             ++foundCnt
-                            outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + ": at " + minute + ":" + String(Math.floor(startAtkTime / 60) % 60).padStart(2, '0') + "\n";
+                            const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
+                            outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": at " + minute + ":" + String(Math.floor(startAtkTime / 60) % 60).padStart(2, '0') + "\n";
                         } else if (!startAtkZone) {
                             startAtkTime = curEvent.frame;
                             startAtkZone = !startAtkZone;
@@ -66,4 +67,4 @@ files.forEach(file => {
     }
 });
 
-console.log("Total occurrence for " + spikeThresold + " spike: " + foundCnt);
+console.log("Total occurrence for " + spikeThresold + " spike++: " + foundCnt);
