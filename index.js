@@ -195,7 +195,11 @@ files.forEach(file => {
                     }
                 }
                 if (foundBef != foundCnt) {
-                    jsonOutput.data.push(replayData.data[i]);
+                    let highlightData = replayData.data[i];
+                    for(let j = 0; j < highlightData.board.length; ++j) {
+                        highlightData.board[j].active = highlightData.board[j].success;
+                    }
+                    jsonOutput.data.push(highlightData);
                     outputReplayHighlights += "\n";
                 }
             }

@@ -13,7 +13,7 @@ files.forEach(file => {
             const replayCount = replayData.data.length;
             for (let i = 0; i < replayCount; ++i) {
                 const board = replayData.data[i].board;
-                for(let j = 0; j < 2; ++j) {
+                for(let j = 0; j < board.length; ++j) {
                     replayData.data[i].board[j].active = board[j].success;
                 }
             }
