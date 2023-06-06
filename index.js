@@ -102,7 +102,6 @@ function idSwap(replay) { // resolve passthrough bug by matching player id
                     replay.data[i].replays[1].events[j].data.data = ["0"];
                 }
             } else {
-                console.log(1);
                 if(j < events_board0.length && events_board0[j].type === "full") {
                     events_board0[j].data.options.countdown = !disable_countdown;
                 }
@@ -120,7 +119,6 @@ files.forEach(file => {
         let rpFrames = 0;
         try {
             const data = fs.readFileSync("./replays/" + file, 'utf8');
-            JSON.parse(data);
             const replayData = JSON.parse(data);
             for (let i = 0; i < 2; ++i) {
                 if (exclude_userName.includes(replayData.data[0].replays[i].events[0].data.options.username))
@@ -140,7 +138,6 @@ files.forEach(file => {
                 let spikeCount = 0;
                 let startAtkTime = 0;
                 let startAtkZone = false;
-                let spikeZone = false;
                 let foundBef = foundCnt;
                 let highlightCount = 0;
                 const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;

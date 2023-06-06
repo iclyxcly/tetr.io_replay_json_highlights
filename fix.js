@@ -9,7 +9,6 @@ files.forEach(file => {
     if (file.substr(-4) === "ttrm") {
         try {
             const data = fs.readFileSync("./replays/" + file, 'utf8');
-            JSON.parse(data);
             let replayData = JSON.parse(data);
             const replayCount = replayData.data.length;
             for (let i = 0; i < replayCount; ++i) {
@@ -23,7 +22,7 @@ files.forEach(file => {
             });
         } catch (err) {
             if (showError)
-                console.log(err);
+                console.log(file + ": " + err);
         }
     }
 });
