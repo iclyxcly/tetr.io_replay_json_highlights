@@ -94,7 +94,7 @@ function idSwap(replay) { // resolve passthrough bug by matching player id
                     events_board1[j].data.export.targets = ["0"];
                 }
             }
-            else if ((j < events_board0.length && events_board0[j].type === "targets") || (j < events_board1.length && events_board1[j].type === "targets")){
+            else if ((j < events_board0.length && events_board0[j].type === "targets") || (j < events_board1.length && events_board1[j].type === "targets")) {
                 if (j < events_board0.length && events_board0[j].type === "targets") {
                     replay.data[i].replays[0].events[j].data.data = ["1"];
                 }
@@ -102,10 +102,10 @@ function idSwap(replay) { // resolve passthrough bug by matching player id
                     replay.data[i].replays[1].events[j].data.data = ["0"];
                 }
             } else {
-                if(j < events_board0.length && events_board0[j].type === "full") {
+                if (j < events_board0.length && events_board0[j].type === "full") {
                     events_board0[j].data.options.countdown = !disable_countdown;
                 }
-                if(j < events_board1.length && events_board1[j].type === "full") {
+                if (j < events_board1.length && events_board1[j].type === "full") {
                     events_board1[j].data.options.countdown = !disable_countdown;
                 }
             }
@@ -147,7 +147,7 @@ files.forEach(file => {
                         outputReplayHighlights += (highlightCount == 0 ? "Round " + ++outputReplayHighlightsCount + (result[result.length - 1].data.reason === "winner" ? "(W)" : "(L)") + " : " : ", ") + result[result.length - 1].data.export.aggregatestats.vsscore + " vs";
                         outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + result[result.length - 1].data.export.aggregatestats.vsscore + " vs" + "\n", ++foundCnt;
                         ++highlightCount;
-                    } if (result[result.length - 1].data.export.aggregatestats.vsscore + result1[result1.length - 1].data.export.aggregatestats.vsscore >= doubletotal_vsThresold) {
+                    } if (result1[result1.length - 1].type === "end" && result[result.length - 1].data.export.aggregatestats.vsscore + result1[result1.length - 1].data.export.aggregatestats.vsscore >= doubletotal_vsThresold) {
                         outputReplayHighlights += (highlightCount == 0 ? "Round " + ++outputReplayHighlightsCount + (result[result.length - 1].data.reason === "winner" ? "(W)" : "(L)") + " : " : ", ") + (result[result.length - 1].data.export.aggregatestats.vsscore + result1[result1.length - 1].data.export.aggregatestats.vsscore) + " vs";
                         outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + (result[result.length - 1].data.export.aggregatestats.vsscore + result1[result1.length - 1].data.export.aggregatestats.vsscore) + " vs" + "\n", ++foundCnt;
                         ++highlightCount;
@@ -196,7 +196,7 @@ files.forEach(file => {
                 }
                 if (foundBef != foundCnt) {
                     let highlightData = replayData.data[i];
-                    for(let j = 0; j < highlightData.board.length; ++j) {
+                    for (let j = 0; j < highlightData.board.length; ++j) {
                         highlightData.board[j].active = highlightData.board[j].success;
                     }
                     jsonOutput.data.push(highlightData);
