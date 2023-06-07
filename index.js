@@ -176,9 +176,9 @@ files.forEach(file => {
                             const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
                             const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;
                             let minute = Math.floor(startAtkTime / 3600);
-                            outputReplayHighlights += (highlightCount == 0 ? "Round " + ++outputReplayHighlightsCount + (result[result.length - 1].data.reason === "winner" ? "(W)" : "(L)") + " : " : ", ") + spikeCount + " spike\n";
+                            outputReplayHighlights += (highlightCount == 0 ? "Round " + ++outputReplayHighlightsCount + (result[result.length - 1].data.reason === "winner" ? "(W)" : "(L)") + " : " : ", ") + spikeCount + " spike";
                             outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + spikeCount + " spike at " + minute + ":" + String(Math.floor(startAtkTime / 60) % 60).padStart(2, '0') + "\n";
-                            ++foundCnt;
+                            ++foundCnt, ++highlightCount;
                         }
                         attackFrame = 0;
                         spikeCount = 0;
