@@ -63,6 +63,9 @@ function idSwap(replay) { // resolve passthrough bug by matching player id
             const oppoboard = board[0];
             replay.data[i].board[0] = board[1];
             replay.data[i].board[1] = oppoboard;
+            let switchBoard = replay.data[i].replays[0];
+            replay.data[i].replays[0] = replay.data[i].replays[1];
+            replay.data[i].replays[1] = switchBoard;
         }
         replay.data[i].board[0].user._id = "0";
         replay.data[i].board[1].user._id = "1";
