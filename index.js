@@ -31,6 +31,7 @@ var jsonOutput = { "ismulti": true, "data": [], "endcontext": [] };
 var outputReplayHighlights = "\n" + outputPath + "\n";
 var outputReplayHighlightsCount = 0;
 var outputReplayHighlightsLength = 0;
+let league_mode = false;
 const files = fs.readdirSync(folderPath);
 
 function shuffleArray(array) {
@@ -58,15 +59,6 @@ function formatTime(seconds) {
 
 function idSwap(replay) { // resolve passthrough bug by matching player id
     for (let i = 0; i < replay.data.length; ++i) {
-        const board = replay.data[i].board;
-        if (!userName.includes(board[0].user.username)) {
-            const oppoboard = board[0];
-            replay.data[i].board[0] = board[1];
-            replay.data[i].board[1] = oppoboard;
-            let switchBoard = replay.data[i].replays[0];
-            replay.data[i].replays[0] = replay.data[i].replays[1];
-            replay.data[i].replays[1] = switchBoard;
-        }
         replay.data[i].board[0].user._id = "0";
         replay.data[i].board[1].user._id = "1";
         const events_board0 = replay.data[i].replays[0].events;
@@ -117,24 +109,33 @@ function idSwap(replay) { // resolve passthrough bug by matching player id
     return replay;
 }
 
+function boardDirSwap(board) {
+    let tmp = board[1];
+    board[1] = board[0];
+    board[0] = tmp;
+    return board;
+}
+
 files.forEach(file => {
     if (file.substr(-4) === "ttrm") {
         let rpFrames = 0;
         try {
+            let outputStr = "";
             const data = fs.readFileSync("./replays/" + file, 'utf8');
             const replayData = JSON.parse(data);
-            for (let i = 0; i < 2; ++i) {
-                if (exclude_userName.includes(replayData.data[0].replays[i].events[0].data.options.username))
+            league_mode = typeof replayData.gametype !== 'undefined' && replayData.gametype === "league";
+            for (let i = 0; i < replayData.data.length; ++i) {
+            for (let j = 0; j < 2; ++j) {
+                if (exclude_userName.includes(replayData.data[i].replays[j].events[league_mode ? 1 : 0].data.options.username))
                     throw new Error(file + ": Skipped username " + exclude_userName);
             }
-            let boardDir = userName.includes(replayData.data[0].replays[0].events[0].data.options.username) ? 1 : userName.includes(replayData.data[0].replays[1].events[0].data.options.username) ? 0 : -1;
+            let boardDir = userName.includes(replayData.data[i].replays[0].events[league_mode ? 1 : 0].data.options.username) ? 0 : userName.includes(replayData.data[i].replays[1].events[league_mode ? 1 : 0].data.options.username) ? 1 : -1;
             if (boardDir === -1) {
                 throw new Error("ERROR ON " + file + ": USERNAME " + userName + " NOT FOUND");
             }
-            let outputStr = "";
-            for (let i = 0; i < replayData.data.length; ++i) {
-                const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
-                const result1 = replayData.data[i].replays[boardDir == 1 ? 1 : 0].events;
+            let rev_boardDir = boardDir == 0 ? 1 : 0;
+                const result = replayData.data[i].replays[boardDir].events;
+                const result1 = replayData.data[i].replays[rev_boardDir].events;
                 if (!show_L && result[result.length - 1].data.reason !== "winner")
                     continue;
                 let attackFrame = 0;
@@ -143,7 +144,7 @@ files.forEach(file => {
                 let startAtkZone = false;
                 let foundBef = foundCnt;
                 let highlightCount = 0;
-                const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;
+                const total_frames = replayData.data[i].replays[boardDir].frames;
                 rpFrames = total_frames;
                 if (result[result.length - 1].type === "end") {
                     if (result[result.length - 1].data.export.aggregatestats.vsscore >= vsThresold) {
@@ -172,12 +173,12 @@ files.forEach(file => {
                         ++highlightCount;
                     }
                 }
-                for (let j = 0; j < replayData.data[i].replays[boardDir].events.length; ++j) {
-                    const curEvent = replayData.data[i].replays[boardDir].events[j];
+                for (let j = 0; j < replayData.data[i].replays[rev_boardDir].events.length; ++j) {
+                    const curEvent = replayData.data[i].replays[rev_boardDir].events[j];
                     if (startAtkZone && curEvent.frame - attackFrame >= spikeTimeout || curEvent.type === "end") {
                         if (spikeCount >= spikeThresold) {
-                            const result = replayData.data[i].replays[boardDir == 0 ? 1 : 0].events;
-                            const total_frames = replayData.data[i].replays[boardDir == 0 ? 1 : 0].frames;
+                            const result = replayData.data[i].replays[boardDir].events;
+                            const total_frames = replayData.data[i].replays[boardDir].frames;
                             let minute = Math.floor(startAtkTime / 3600);
                             outputReplayHighlights += (highlightCount == 0 ? "Round " + ++outputReplayHighlightsCount + (result[result.length - 1].data.reason === "winner" ? "(W)" : "(L)") + " : " : ", ") + spikeCount + " spike";
                             outputStr += "Round " + (i + 1) + (i + 1 < 10 ? "  " : i + 1 < 100 ? " " : "") + "(" + Math.floor(total_frames / 3600) + ":" + String(Math.floor(total_frames / 60) % 60).padStart(2, '0') + ")" + (result[result.length - 1].data.reason === "winner" ? " (W)" : " (L)") + ": " + spikeCount + " spike at " + minute + ":" + String(Math.floor(startAtkTime / 60) % 60).padStart(2, '0') + "\n";
@@ -201,6 +202,12 @@ files.forEach(file => {
                     let highlightData = replayData.data[i];
                     for (let j = 0; j < highlightData.board.length; ++j) {
                         highlightData.board[j].active = highlightData.board[j].success;
+                    }
+                    if(boardDir == 1) {
+                        highlightData.replays = boardDirSwap(highlightData.replays);
+                    }
+                    if(!userName.includes(highlightData.board[0].user.username)) {
+                        highlightData.board = boardDirSwap(highlightData.board);
                     }
                     jsonOutput.data.push(highlightData);
                     outputReplayHighlights += "\n";
