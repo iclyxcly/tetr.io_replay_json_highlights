@@ -14,7 +14,7 @@ const pcThresold = 99;
 const b2bThresold = 99;
 const apmThresold = 999;
 
-const spikeTimeout = 55; // 1 second = 60
+const spikeTimeout = 60; // 1 second = 60
 
 const showError = true;
 
@@ -175,7 +175,8 @@ files.forEach(file => {
                 }
                 for (let j = 0; j < replayData.data[i].replays[rev_boardDir].events.length; ++j) {
                     const curEvent = replayData.data[i].replays[rev_boardDir].events[j];
-                    if (startAtkZone && curEvent.frame - attackFrame >= spikeTimeout || curEvent.type === "end") {
+                    const is_atk = curEvent.type === "ige" && curEvent.data.type === "ige" && curEvent.data.data.type === "interaction";
+                    if (is_atk && startAtkZone && curEvent.data.data.sent_frame - attackFrame >= spikeTimeout || curEvent.type === "end") {
                         if (spikeCount >= spikeThresold) {
                             const result = replayData.data[i].replays[boardDir].events;
                             const total_frames = replayData.data[i].replays[boardDir].frames;
@@ -189,9 +190,10 @@ files.forEach(file => {
                         spikeZone = false;
                         startAtkTime = 0;
                         startAtkZone = false;
-                    } else if (curEvent.type === "ige" && curEvent.data.type === "ige" && curEvent.data.data.type === "interaction") {
+                    }
+                    if (is_atk) {
                         spikeCount += curEvent.data.data.data.amt;
-                        attackFrame = curEvent.frame;
+                        attackFrame = curEvent.data.data.sent_frame;
                         if (!startAtkZone) {
                             startAtkTime = curEvent.frame;
                             startAtkZone = !startAtkZone;
